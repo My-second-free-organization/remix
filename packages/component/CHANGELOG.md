@@ -2,6 +2,202 @@
 
 This is the changelog for [`component`](https://github.com/remix-run/remix/tree/main/packages/component). It follows [semantic versioning](https://semver.org/).
 
+## v0.6.0
+
+### Minor Changes
+
+- BREAKING CHANGE: remove legacy host-element `on` prop support in `@remix-run/component`.
+
+  Use the `on()` mixin instead:
+
+  - Old: `<button on={{ click() {} }} />`
+  - New: `<button mix={[on('click', () => {})]} />`
+
+  This change removes built-in host `on` handling from runtime, typing, and host-prop composition. Component-level `handle.on(...)` remains supported.
+
+- BREAKING CHANGE: remove legacy host-element `css` prop runtime support in `@remix-run/component`.
+
+  Use the `css(...)` mixin instead:
+
+  - Old: `<div css={{ color: 'red' }} />`
+  - New: `<div mix={[css({ color: 'red' })]} />`
+
+  This aligns styling behavior with the new mixin composition model.
+
+- BREAKING CHANGE: remove legacy host-element `animate` prop runtime support in `@remix-run/component`.
+
+  Use animation mixins instead:
+
+  - Old: `<div animate={{ enter: true, exit: true, layout: true }} />`
+  - New: `<div mix={[animateEntrance(), animateExit(), animateLayout()]} />`
+
+  This aligns animation behavior with the new mixin composition model.
+
+- BREAKING CHANGE: remove legacy host-element `connect` prop support in `@remix-run/component`.
+
+  Use the `ref(...)` mixin instead:
+
+  - Old: `<div connect={(node, signal) => {}} />`
+  - New: `<div mix={[ref((node, signal) => {})]} />`
+
+  This aligns element reference and teardown behavior with the mixin composition model.
+
+- BREAKING CHANGE: the `@remix-run/interaction` package has been removed.
+
+  `handle.on(...)` APIs were also removed from component and mixin handles.
+
+  Before/after migration:
+
+  **Interaction package APIs:**
+
+  - Before: `defineInteraction(...)`, `createContainer(...)`, `on(target, listeners)` from `@remix-run/interaction`.
+  - After: use component APIs (`createMixin(...)`, `on(...)`, `addEventListeners(...)`) from `@remix-run/component`.
+
+  ```ts
+  // Before
+  import { on } from '@remix-run/interaction'
+
+  let dispose = on(window, {
+    resize() {
+      console.log('resized')
+    },
+  })
+
+  // After
+  import { addEventListeners } from '@remix-run/component'
+
+  let controller = new AbortController()
+  addEventListeners(window, controller.signal, {
+    resize() {
+      console.log('resized')
+    },
+  })
+  ```
+
+  **Component handle API:**
+
+  - Before: `handle.on(target, listeners)`.
+  - After: `addEventListeners(target, handle.signal, listeners)`.
+
+  ```tsx
+  // Before
+  function KeyboardTracker(handle: Handle) {
+    handle.on(document, {
+      keydown(event) {
+        console.log(event.key)
+      },
+    })
+    return () => null
+  }
+
+  // After
+  import { addEventListeners } from '@remix-run/component'
+
+  function KeyboardTracker(handle: Handle) {
+    addEventListeners(document, handle.signal, {
+      keydown(event) {
+        console.log(event.key)
+      },
+    })
+    return () => null
+  }
+  ```
+
+  **Custom interaction patterns:**
+
+  - Before: `defineInteraction(...)` + interaction setup function.
+  - After: event mixins (`createMixin(...)`) that compose `on(...)` listeners and dispatch typed custom events.
+
+  ```tsx
+  // Before
+  import { defineInteraction, type Interaction } from '@remix-run/interaction'
+
+  export let tempo = defineInteraction('my:tempo', Tempo)
+
+  function Tempo(handle: Interaction) {
+    handle.on(handle.target, {
+      click() {
+        handle.target.dispatchEvent(new TempoEvent(bmp))
+      },
+    })
+  }
+
+  // App consumption (before, JSX)
+  function TempoButtonBefore() {
+    return () => (
+      <button
+        on={{
+          [tempo](event) {
+            console.log(event.bpm)
+          },
+        }}
+      />
+    )
+  }
+
+  // After
+  import { createMixin, on } from '@remix-run/component'
+
+  export let tempo = 'my:tempo' as const
+
+  export let tempoEvents = createMixin<HTMLElement>((handle) => {
+    return () => (
+      <handle.element
+        mix={[
+          on('click', (event) => {
+            event.currentTarget.dispatchEvent(new TempoEvent(bpm))
+          }),
+        ]}
+      />
+    )
+  })
+
+  // App consumption (after)
+  function TempoButton() {
+    return () => (
+      <button
+        mix={[
+          tempoEvents(),
+          on(tempo, (event) => {
+            console.log(event.detail.bpm)
+          }),
+        ]}
+      />
+    )
+  }
+  ```
+
+  **TypedEventTarget**
+
+  `TypedEventTarget` is now exported from `@remix-run/component`.
+
+- Add the new host `mix` prop and mixin authoring APIs in `@remix-run/component`.
+
+  New exports include:
+
+  - `createMixin`
+  - `MixinDescriptor`, `MixinHandle`, `MixinType`, `MixValue`
+  - `on(...)`
+  - `ref(...)`
+  - `css(...)`
+
+  This enables reusable host behaviors and composable element capabilities without bespoke host props.
+
+- Add new interaction mixins for normalized user input events:
+
+  - `pressEvents(...)` for pointer/keyboard "press" interactions
+  - `keysEvents(...)` for keyboard key state events
+
+  These helpers provide a consistent mixin-based interaction model for input handling.
+
+- Add mixin-first animation APIs for host elements:
+
+  - `animateEntrance(...)`
+  - `animateExit(...)`
+  - `animateLayout(...)`
+
+  These APIs move entrance/exit/layout animation behavior to composable mixins that can be combined with other host behaviors.
+
 ## v0.5.0
 
 ### Minor Changes

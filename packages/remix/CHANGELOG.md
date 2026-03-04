@@ -2,6 +2,25 @@
 
 This is the changelog for [`remix`](https://github.com/remix-run/remix/tree/main/packages/remix). It follows [semantic versioning](https://semver.org/).
 
+## v3.0.0-alpha.4
+
+### Pre-release Changes
+
+- Bumped `@remix-run/*` dependencies:
+  - [`async-context-middleware@0.1.4`](https://github.com/remix-run/remix/releases/tag/async-context-middleware@0.1.4)
+  - [`component@0.6.0`](https://github.com/remix-run/remix/releases/tag/component@0.6.0)
+  - [`compression-middleware@0.1.4`](https://github.com/remix-run/remix/releases/tag/compression-middleware@0.1.4)
+  - [`data-table@0.2.0`](https://github.com/remix-run/remix/releases/tag/data-table@0.2.0)
+  - [`data-table-mysql@0.2.0`](https://github.com/remix-run/remix/releases/tag/data-table-mysql@0.2.0)
+  - [`data-table-postgres@0.2.0`](https://github.com/remix-run/remix/releases/tag/data-table-postgres@0.2.0)
+  - [`data-table-sqlite@0.2.0`](https://github.com/remix-run/remix/releases/tag/data-table-sqlite@0.2.0)
+  - [`fetch-router@0.18.0`](https://github.com/remix-run/remix/releases/tag/fetch-router@0.18.0)
+  - [`form-data-middleware@0.2.0`](https://github.com/remix-run/remix/releases/tag/form-data-middleware@0.2.0)
+  - [`logger-middleware@0.1.4`](https://github.com/remix-run/remix/releases/tag/logger-middleware@0.1.4)
+  - [`method-override-middleware@0.1.5`](https://github.com/remix-run/remix/releases/tag/method-override-middleware@0.1.5)
+  - [`session-middleware@0.2.0`](https://github.com/remix-run/remix/releases/tag/session-middleware@0.2.0)
+  - [`static-middleware@0.4.5`](https://github.com/remix-run/remix/releases/tag/static-middleware@0.4.5)
+
 ## v3.0.0-alpha.3
 
 ### Pre-release Changes
